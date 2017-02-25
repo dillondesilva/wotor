@@ -1,0 +1,15 @@
+{
+  "parser": "babel-eslint",
+  "extends": "standard",
+  "rules": {
+    "semi": [2, "always"]
+  },
+  "env": {
+    "commonjs": true,
+    "es6": true,
+    "node": true
+  },
+  "globals": {
+    "Phaser": false
+  }
+}
