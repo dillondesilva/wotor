@@ -9,7 +9,7 @@
     "clean": "rm -rf out",
     "build": "npm run clean && babel src/ -d out/ --source-maps && cp -r game out/",
     "buildTests": "npm run clean && babel test/ -d out/test --source-maps && babel src/ -d out/src --source-maps",
-    "eslint": "eslint --fix src test",
+    "eslint": "eslint --fix src test game/js",
     "test": "istanbul cover node_modules/.bin/_mocha -- -u exports --compilers js:babel-core/register -R spec -r test/setup.js test/*{,*/}*.js",
     "watch": "nodemon --ignore out/ --ignore node_modules/ --exec 'npm run eslint && npm run test && npm run build'",
     "server": "npm run build && nodemon --ignore node_modules/ --ignore src/ --ignore test/ out/index.js",

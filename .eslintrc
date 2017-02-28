@@ -2,7 +2,8 @@
   "parser": "babel-eslint",
   "extends": "standard",
   "rules": {
-    "semi": [2, "always"]
+    "semi": [2, "always"],
+    "no-trailing-spaces": [0, { "skipBlankLines": true }]
   },
   "env": {
     "commonjs": true,
@@ -10,6 +11,7 @@
     "node": true
   },
   "globals": {
-    "Phaser": false
+    "Phaser": false,
+    "game": false
   }
 }
