@@ -8,6 +8,7 @@ function preload () {
   game.load.image('bullet2', 'assets/player2bullet.png');
   game.load.image('ship2', 'assets/player2ship.PNG');
   game.load.image('enemy', 'assets/enemyship.png');
+  game.load.image('asteroid', 'assets/asteroid.png');
 }
 
 // List of necessary global variables
@@ -63,6 +64,7 @@ function create () {
 
   // Set a time loop so that every second, the createEnemy function is called to create an enemy
   game.time.events.loop(Phaser.Timer.SECOND, createEnemy, this);
+  game.time.events.loop(Phaser.Timer.SECOND, createAsteroid, this);
 }
 
 function update () {
@@ -105,6 +107,13 @@ function createEnemy () {
   enemy.body.gravity.y = 100;
 }
 
+function createAsteroid () {
+  var asteroid = game.add.sprite(game.world.randomX, -60, 'asteroid');
+
+  game.physics.arcade.enable(asteroid);
+  asteroid.body.gravity.y = 100;
+}
+
 // Let's shoot something
 function fireBullet () {
   if (game.time.now > bulletTime) {
@@ -120,6 +129,7 @@ function fireBullet () {
   }
 }
 
+// Same function as fireBullet except it does it with player 2
 function fireBulletPlayer2 () {
   if (game.time.now > bullet2Time) {
     var bullet = bullets2.getFirstExists(false);
