@@ -1,6 +1,4 @@
 {
-  "parser": "babel-eslint",
-  "extends": "standard",
   "rules": {
     "semi": [2, "always"],
     "no-trailing-spaces": [0, { "skipBlankLines": true }]
