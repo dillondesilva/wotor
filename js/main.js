@@ -1,8 +1,10 @@
-function main(playButton, gameView, username) {
-  playButton.addEventListener('click', function() {
-    if (username.value === "") {
+function main(gameView, welcomeView) {
+  welcomeView.querySelector('#btnPlay1').addEventListener('click', function() {
+    var username = welcomeView.querySelector('#username').value;
+    if (username === "") {
       alert('Oops! Captain can you please give us your id?');
     } else {
+      document.body.removeChild(welcomeView);
       startGame({
         viewElement: gameView
       });
@@ -10,12 +12,13 @@ function main(playButton, gameView, username) {
   });
 }
 
-function twoPlayer(playButton, gameView, username) {
-  playButton.addEventListener('click', function() {
-
-    if (username.value === "") {
+function twoPlayer(gameView, welcomeView) {
+  welcomeView.querySelector('#btnPlay2').addEventListener('click', function() {
+    var username = welcomeView.querySelector('#username').value;
+    if (username === "") {
       alert('Oops! Captain can you please give us your id?');
     } else {
+      document.body.remove(welcomeView);
       startGame({
         viewElement: gameView
       });
@@ -24,11 +27,9 @@ function twoPlayer(playButton, gameView, username) {
 }
 
 this.main(
-  document.getElementById('btnPlay1'),
   document.getElementById('vwGame'),
-  document.getElementById("username"));
+  document.getElementById("vwWelcome"));
 
 this.twoPlayer(
-  document.getElementById('btnPlay2'),
   document.getElementById('vwGame'),
-  document.getElementById("username"));
+  document.getElementById("vwWelcome"));
