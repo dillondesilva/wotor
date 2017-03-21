@@ -1,6 +1,6 @@
 function main(playButton, gameView, username) {
   playButton.addEventListener('click', function() {
-    if (username === "") {
+    if (username.value === "") {
       alert('Oops! Captain can you please give us your id?');
     } else {
       startGame({
@@ -13,7 +13,7 @@ function main(playButton, gameView, username) {
 function twoPlayer(playButton, gameView, username) {
   playButton.addEventListener('click', function() {
 
-    if (username === "") {
+    if (username.value === "") {
       alert('Oops! Captain can you please give us your id?');
     } else {
       startGame({
@@ -23,5 +23,12 @@ function twoPlayer(playButton, gameView, username) {
   });
 }
 
-this.main(document.getElementById('btnPlay1'), document.getElementById('vwGame'), document.getElementById("username").value);
-this.twoPlayer(document.getElementById('btnPlay2'), document.getElementById('vwGame'), document.getElementById("username").value);
+this.main(
+  document.getElementById('btnPlay1'),
+  document.getElementById('vwGame'),
+  document.getElementById("username"));
+
+this.twoPlayer(
+  document.getElementById('btnPlay2'),
+  document.getElementById('vwGame'),
+  document.getElementById("username"));
