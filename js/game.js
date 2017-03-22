@@ -139,13 +139,21 @@ function update () {
 }
 
 function playerOneDeath (bullet, player1) {
+  // Kill player 1 and get rid of their bullets
   player1.kill();
   bullet.kill();
+  bullets.destroy(true);
+
+  setTimeout(function() {
+    player1.revive();
+  }, 15000);
 }
 
 function playerTwoDeath (bullet, player2) {
+  // Kill player 2 and get rid of their bullets
   player2.kill();
   bullet.kill();
+  bullets2.destroy(true);
 }
 
 function enemyDeath (bullet, enemy) {
@@ -155,7 +163,6 @@ function enemyDeath (bullet, enemy) {
 
   // Kill the bullet and enemies
   enemy.kill();
-  bullet.kill();
 }
 
 function createEnemy () {
