@@ -1,11 +1,11 @@
 var game;
 
-function startGame(context) {
+function campaign(context) {
   game = new Phaser.Game(800,
     600,
     Phaser.AUTO,
     context.viewElement,
-    { preload: preload, create: create, update: update, render: render});
+    { preload: preload, create: create, update: update});
 }
 
 function preload () {
@@ -13,20 +13,16 @@ function preload () {
   game.load.image('sky', 'assets/space.png');
   game.load.spritesheet('ship', 'assets/spaceship.png', 50, 68, 2);
   game.load.image('bullet', 'assets/playerbullet.png');
-  game.load.image('bullet2', 'assets/player2bullet.png');
-  game.load.spritesheet('ship2', 'assets/player2ship.png', 65, 61, 2);
   game.load.spritesheet('enemy', 'assets/enemyship.png', 43, 65, 2);
   game.load.spritesheet('explosion', 'assets/explosion.png', 32, 32, 18);
-  game.load.image('asteroid', 'assets/asteroid.png');
+  game.load.image('asteroid', 'assets/rock.png');
   game.load.image('enemyBullet', 'assets/enemyBullet.png');
 }
 
 // List of necessary global variables
 var player1;
-var player2;
 var cursors;
 var bullets;
-var bullets2;
 var score = 0;
 var scoreText;
 var explosions;
@@ -43,14 +39,13 @@ function create () {
   // Sprites
   game.add.sprite(0, 0, 'sky');
   player1 = game.add.sprite(400, 450, 'ship');
-  player2 = game.add.sprite(300, 450, 'ship2');
 
   // My game will use the Phaser Arcade Physics System
   game.physics.startSystem(Phaser.Physics.ARCADE);
   game.physics.arcade.enable(player1);
-  game.physics.arcade.enable(player2);
 
   enemies = game.add.group();
+  asteroids = game.add.group();
 
   // The group of bullets for player one and its setup
   bullets = game.add.group();
@@ -87,30 +82,26 @@ function create () {
   // Keys that will be used for the game
   cursors = game.input.keyboard.createCursorKeys();
   waspace = {
-    left: game.input.keyboard.addKey(Phaser.Keyboard.A),
-    right: game.input.keyboard.addKey(Phaser.Keyboard.D),
     space: game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR),
-    shoot: game.input.keyboard.addKey(Phaser.Keyboard.Q)
   };
 
   // Create the element to display the score as text
   scoreText = game.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#999' });
 
   // Create our emission animations for our characters
-  var emissionsP1 = player1.animations.add('emissionsP1');
+  player1.animations.add('emissionsP1');
   player1.animations.play('emissionsP1', 70, true);
 
-  var emissionsP2 = player2.animations.add('emissionsP2');
-  player2.animations.play('emissionsP2', 70, true);
-
   // Set a time loop so that every second, the createEnemy function is called to create an enemy
-  game.time.events.loop(Phaser.Timer.HALF, createEnemy, this);
+  game.time.events.loop(Phaser.Timer.SECOND, createEnemy, this);
+
+  // Set a time loop so that every second, the createAsteroid function is called to create an asteroid
+  game.time.events.loop(Phaser.Timer.SECOND, createAsteroid, this);
 }
 
 function update () {
   // The following blocks will have to do with getting input from the keys
   player1.body.velocity.x = 0;
-  player2.body.velocity.x = 0;
 
   if (cursors.left.isDown) {
     player1.body.velocity.x = -180;
@@ -120,60 +111,22 @@ function update () {
     player1.frame = 4;
   }
 
-  if (waspace.left.isDown) {
-    player2.body.velocity.x = -180;
-  } else if (waspace.right.isDown) {
-    player2.body.velocity.x = 150;
-  } else {
-    player2.frame = 4;
-  }
-
-  // If the space bar or q is pressed, it will launch the functions to fire each player's bullets respectively
+  // If the space bar is pressed, it will launch the functions to fire each player 1s bullets
   if (waspace.space.isDown) {
     fireBullet();
   }
 
-  if (waspace.shoot.isDown) {
-    fireBulletPlayer2();
-  }
-
   // The following block of code deals with if their is a collision between specific game objects
   game.physics.arcade.overlap(player1, enemyBullets, playerOneDeath, null, this);
-  game.physics.arcade.overlap(enemyBullets, player2, playerOneDeath, null, this);
   game.physics.arcade.overlap(bullets, enemies, enemyDeath, null, this);
-  game.physics.arcade.overlap(bullets2, enemies, enemyDeath, null, this);
+  game.physics.arcade.overlap(player1, enemies, playerOneDeath, null, this);
 }
 
 function playerOneDeath (player1, bullet) {
   // Create an explosion
-  player1.animations.add('explosion');
-
-  var kaboom = explosions.getFirstExists(false);
-  kaboom.reset(player1.body.x, player1.body.y);
-  kaboom.play('explosion', 30, false, true);
-
-  // Kill player 1 and get rid of their bullets
-  player1.kill();
-  bullet.kill();
-
-  setTimeout(function() {
-    player1.revive();
-
-    player1.loadTexture('player1', 0);
-    player1.animations.add('emissionsP1');
-    player1.animations.play('emissionsP1', 70, true);
-  }, 3000);
-}
-
-function playerTwoDeath (bullet, player2) {
-  // Create an explosion
-  var kaboom = explosions.getFirstExists(false);
-  kaboom.reset(player2.body.x, player2.body.y);
-  kaboom.play('explosion', 30, false);
-
-  // Kill player 2 and get rid of their bullets
-  player2.kill();
-  bullet.kill();
+  player1.loadTexture('explosion');
+  player1.animations.add('kaboom');
+  player1.animations.play('kaboom', 35, false, true);
 }
 
 function enemyDeath (bullet, enemy) {
@@ -209,7 +162,18 @@ function createEnemy () {
   // Makes the enemy fire their bullet 1 second after spawn
   setTimeout(function() {
     fireEnemyBullet(enemy);
-}, 1000);
+}, 0);
+}
+
+function createAsteroid () {
+  // Uses the same process for adding the enemies with a random x coordinate except it does it with the asteroid sprite
+  var asteroid = game.add.sprite(Math.floor(Math.random() * 750, 10), -60, 'asteroid');
+
+  // Activate the physics system and set gravity on it to 250
+  game.physics.arcade.enable(asteroid);
+  asteroid.body.gravity.y = 250;
+  asteroid.checkWorldBounds = true;
+  asteroid.outOfBoundsKill = true;
 }
 
 // Let's shoot something
@@ -223,19 +187,6 @@ function fireBullet () {
       bullet.reset(player1.x + 23, player1.y + 8);
       bullet.body.velocity.y = -400;
       bulletTime = game.time.now + 200;
-    }
-  }
-}
-
-// Same function as fireBullet except it does it with player 2
-function fireBulletPlayer2 () {
-  if (game.time.now > bullet2Time) {
-    var bullet = bullets2.getFirstExists(false);
-
-    if (bullet) {
-      bullet.reset(player2.x + 30, player2.y + 8);
-      bullet.body.velocity.y = -400;
-      bullet2Time = game.time.now + 200;
     }
   }
 }

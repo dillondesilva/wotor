@@ -5,7 +5,7 @@ function main(gameView, welcomeView) {
       alert('Oops! Captain can you please give us your id?');
     } else {
       document.body.removeChild(welcomeView);
-      startGame({
+      campaign({
         viewElement: gameView
       });
     }
