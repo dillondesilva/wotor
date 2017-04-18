@@ -6,6 +6,10 @@ function campaign(context) {
     Phaser.AUTO,
     context.viewElement,
     { preload: preload, create: create, update: update});
+
+    this.game.stage.scale.pageAlignHorizontally = true;
+    this.game.stage.scale.pageAlignVertically = true;
+    this.game.stage.scale.refresh();
 }
 
 function preload () {
@@ -14,8 +18,8 @@ function preload () {
   game.load.spritesheet('ship', 'assets/spaceship.png', 50, 68, 2);
   game.load.image('bullet', 'assets/playerbullet.png');
   game.load.spritesheet('enemy', 'assets/enemyship.png', 43, 65, 2);
-  game.load.spritesheet('explosion', 'assets/explosion.png', 32, 32, 18);
-  game.load.image('asteroid', 'assets/rock.png');
+  game.load.spritesheet('explosion', 'assets/explosion.png', 64, 64, 18);
+  game.load.image('asteroid', 'assets/asteroid.png');
   game.load.image('enemyBullet', 'assets/enemyBullet.png');
 }
 
@@ -25,13 +29,14 @@ var cursors;
 var bullets;
 var score = 0;
 var scoreText;
-var explosions;
+var totalScoreText;
+var restartText;
 var enemies;
 var asteroids;
 var enemyBullets;
+var gameOverText;
 var waspace;
 var bulletTime = 0;
-var bullet2Time = 0;
 var enemyBulletTime = 0;
 
 // Create world
@@ -47,6 +52,9 @@ function create () {
   enemies = game.add.group();
   asteroids = game.add.group();
 
+  enemies.removeAll();
+  asteroids.removeAll();
+
   // The group of bullets for player one and its setup
   bullets = game.add.group();
   bullets.enableBody = true;
@@ -57,16 +65,6 @@ function create () {
   bullets.setAll('outOfBoundsKill', true);
   bullets.setAll('checkWorldBounds', true);
 
-  // The group of bullets for player two and its setup
-  bullets2 = game.add.group();
-  bullets2.enableBody = true;
-  bullets2.physicsBodyType = Phaser.Physics.ARCADE;
-  bullets2.createMultiple(30, 'bullet2');
-  bullets2.setAll('anchor.x', 0.5);
-  bullets2.setAll('anchor.y', 1);
-  bullets2.setAll('outOfBoundsKill', true);
-  bullets2.setAll('checkWorldBounds', true);
-
   enemyBullets = game.add.group();
   enemyBullets.enableBody = true;
   enemyBullets.physicsBodyType = Phaser.Physics.ARCADE;
@@ -76,9 +74,6 @@ function create () {
   enemyBullets.setAll('outOfBoundsKill', true);
   enemyBullets.setAll('checkWorldBounds', true);
 
-  explosions = game.add.group();
-  explosions.createMultiple(30, 'explosion');
-
   // Keys that will be used for the game
   cursors = game.input.keyboard.createCursorKeys();
   waspace = {
@@ -86,17 +81,29 @@ function create () {
   };
 
   // Create the element to display the score as text
-  scoreText = game.add.text(16, 16, 'Score: 0', { fontSize: '32px', fill: '#999' });
+  scoreText = game.add.text(16, 16, 'Score: 0', { font: '32px Tahoma', fill: '#999' });
+
+  // Create the element to say Game Over as text
+  gameOverText = game.add.text(200, 175, 'Game Over', {font: '64px Tahoma', fill: '#999'});
+  gameOverText.visible = false;
+
+  // Create the element to display the total score at the end of the game
+  totalScoreText = game.add.text(160, 250, 'Your Final Score was ', {font: '32px Tahoma', fill: '#999' });
+  totalScoreText.visible = false;
+
+  // Create the element that displays the message to click anywhere to restart
+  restartText = game.add.text(120, 290, 'Click Anywhere to Restart the Game', {font: '32px Tahoma', fill: '#999'});
+  restartText.visible = false;
 
   // Create our emission animations for our characters
   player1.animations.add('emissionsP1');
-  player1.animations.play('emissionsP1', 70, true);
+  player1.animations.play('emissionsP1', 50, true);
 
   // Set a time loop so that every second, the createEnemy function is called to create an enemy
-  game.time.events.loop(Phaser.Timer.SECOND, createEnemy, this);
+  game.time.events.loop(Phaser.Timer.SECOND * 2, createEnemy, this);
 
   // Set a time loop so that every second, the createAsteroid function is called to create an asteroid
-  game.time.events.loop(Phaser.Timer.SECOND, createAsteroid, this);
+  game.time.events.loop(Phaser.Timer.SECOND * 4, createAsteroid, this);
 }
 
 function update () {
@@ -120,6 +127,8 @@ function update () {
   game.physics.arcade.overlap(player1, enemyBullets, playerOneDeath, null, this);
   game.physics.arcade.overlap(bullets, enemies, enemyDeath, null, this);
   game.physics.arcade.overlap(player1, enemies, playerOneDeath, null, this);
+  game.physics.arcade.overlap(player1, asteroids, playerOneDeath, null, this);
+  game.physics.arcade.overlap(asteroids, bullets, asteroidExplosion, null, this);
 }
 
 function playerOneDeath (player1, bullet) {
@@ -127,20 +136,56 @@ function playerOneDeath (player1, bullet) {
   player1.loadTexture('explosion');
   player1.animations.add('kaboom');
   player1.animations.play('kaboom', 35, false, true);
+
+  // Destroy all the groups
+  enemies.destroy();
+  asteroids.destroy();
+  enemyBullets.destroy();
+  bullets.destroy();
+
+  // Set the visibility of specific text elements to true
+  gameOverText.visible = true;
+  scoreText.visible = false;
+  totalScoreText.text = "Your Final Score was " + score + " Points";
+  totalScoreText.visible = true;
+  restartText.visible = true;
+
+  // Call the restart function once any part of the game has been clicked
+  game.input.onTap.addOnce(restart, this);
 }
 
 function enemyDeath (bullet, enemy) {
-  // Deal with putting up the score
-  score = score + 100;
-  scoreText.text = 'Score: ' + score;
+  // Deactivate the enemies basic abilities. E.g: Gravity
+  enemy.body.moves = false;
 
   // Create an explosion
-  var kaboom = explosions.getFirstExists(false);
-  kaboom.reset(enemy.body.x, enemy.body.y);
-  kaboom.play('explosion', 30, false);
+  enemy.loadTexture('explosion');
+  enemy.animations.add('kaboom');
+  enemy.animations.play('kaboom', 35, false, true);
+
+  // Deal with putting up the score by 100
+  score += 100;
+  scoreText.text = 'Score: ' + score;
 
   // Kill the bullet and enemies
-  enemy.kill();
+  bullet.kill();
+}
+
+function asteroidExplosion (asteroid, bullet) {
+  // Deactivate the asteroids basic abilities. E.g: Gravity
+  asteroid.body.moves = false;
+
+  // Create an explosion
+  asteroid.loadTexture('explosion');
+  asteroid.animations.add('kaboom');
+  asteroid.animations.play('kaboom', 35, false, true);
+
+  // Deal with putting up the score by 50
+  score += 50;
+  scoreText.text = 'Score: ' + score;
+
+  // Kill the bullet
+  bullet.kill();
 }
 
 function createEnemy () {
@@ -157,7 +202,7 @@ function createEnemy () {
 
 
   var emissionsEnemy = enemy.animations.add('emissionsEnemy');
-  enemy.animations.play('emissionsEnemy', 70, true);
+  enemy.animations.play('emissionsEnemy', 50, true);
 
   // Makes the enemy fire their bullet 1 second after spawn
   setTimeout(function() {
@@ -172,8 +217,9 @@ function createAsteroid () {
   // Activate the physics system and set gravity on it to 250
   game.physics.arcade.enable(asteroid);
   asteroid.body.gravity.y = 250;
-  asteroid.checkWorldBounds = true;
   asteroid.outOfBoundsKill = true;
+
+  asteroids.add(asteroid);
 }
 
 // Let's shoot something
@@ -202,4 +248,10 @@ function fireEnemyBullet (enemy) {
         enemyBulletTime = game.time.now + 200;
       }
     }
+}
+
+// Note this function is the same as create accept it does a few different things
+function restart () {
+  score = 0;
+  this.create();
 }
