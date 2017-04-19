@@ -33,6 +33,8 @@ var totalScoreText;
 var restartText;
 var enemies;
 var asteroids;
+var creatingEnemyLoop;
+var creatingAsteroidLoop;
 var enemyBullets;
 var gameOverText;
 var waspace;
@@ -51,9 +53,6 @@ function create () {
 
   enemies = game.add.group();
   asteroids = game.add.group();
-
-  enemies.removeAll();
-  asteroids.removeAll();
 
   // The group of bullets for player one and its setup
   bullets = game.add.group();
@@ -100,10 +99,10 @@ function create () {
   player1.animations.play('emissionsP1', 50, true);
 
   // Set a time loop so that every second, the createEnemy function is called to create an enemy
-  game.time.events.loop(Phaser.Timer.SECOND * 2, createEnemy, this);
+  creatingEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND, createEnemy, this);
 
   // Set a time loop so that every second, the createAsteroid function is called to create an asteroid
-  game.time.events.loop(Phaser.Timer.SECOND * 4, createAsteroid, this);
+  creatingAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 4, createAsteroid, this);
 }
 
 function update () {
@@ -111,9 +110,9 @@ function update () {
   player1.body.velocity.x = 0;
 
   if (cursors.left.isDown) {
-    player1.body.velocity.x = -180;
+    player1.body.velocity.x = -200;
   } else if (cursors.right.isDown) {
-    player1.body.velocity.x = 180;
+    player1.body.velocity.x = 200;
   } else {
     player1.frame = 4;
   }
@@ -143,12 +142,18 @@ function playerOneDeath (player1, bullet) {
   enemyBullets.destroy();
   bullets.destroy();
 
+  enemies.destroyChildren = true;
+
   // Set the visibility of specific text elements to true
   gameOverText.visible = true;
   scoreText.visible = false;
   totalScoreText.text = "Your Final Score was " + score + " Points";
   totalScoreText.visible = true;
   restartText.visible = true;
+
+  // Stop loops creating enemies and asteroids
+  game.time.events.remove(creatingEnemyLoop);
+  game.time.events.remove(creatingAsteroidLoop);
 
   // Call the restart function once any part of the game has been clicked
   game.input.onTap.addOnce(restart, this);
