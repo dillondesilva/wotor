@@ -19,12 +19,14 @@ var cursors;
 var bullets;
 var score = 0;
 var scoreText;
+var timer;
+var logText;
 var totalScoreText;
 var restartText;
 var enemies;
 var asteroids;
-var createEnemyLoop;
-var createAsteroidLoop;
+var creatingEnemyLoop;
+var creatingAsteroidLoop;
 var enemyBullets;
 var gameOverText;
 var waspace;
@@ -84,15 +86,22 @@ function create () {
   restartText = game.add.text(120, 290, 'Click Anywhere to Restart the Game', {font: '32px Tahoma', fill: '#999'});
   restartText.visible = false;
 
+  // Create the element that displays logs when the diffiuclty has changed
+  logText = game.add.text(60, 550, 'Difficulty Increased', {font: '16px Tahoma', fill: '#999'});
+  logText.visible = false;
+
   // Create our emission animations for our characters
   player1.animations.add('emissionsP1');
   player1.animations.play('emissionsP1', 50, true);
 
   // Set a time loop so that every second, the createEnemy function is called to create an enemy
-  createEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 4, createEnemy, this);
+  creatingEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 4, createEnemy, this);
 
   // Set a time loop so that every second, the createAsteroid function is called to create an asteroid
-  createAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 6, createAsteroid, this);
+  creatingAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 6, createAsteroid, this);
+
+  // Set a timer for the first change in difficulty
+  timer = game.time.events.add(Phaser.Timer.SECOND * 20, firstChangeDifficulty, this);
 }
 
 function update () {
@@ -118,47 +127,6 @@ function update () {
   game.physics.arcade.overlap(player1, enemies, playerOneDeath, null, this);
   game.physics.arcade.overlap(player1, asteroids, playerOneDeath, null, this);
   game.physics.arcade.overlap(asteroids, bullets, asteroidExplosion, null, this);
-
-  // The following block of code deals with increasing the difficulty based on the score
-  if (score === 200) {
-    // Delete our loops making the enemies and asteroids
-    game.time.events.remove(createEnemyLoop);
-    game.time.events.remove(createAsteroidLoop);
-
-    // And replace them with quicker ones
-    createEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 2, createEnemy, this);
-    createAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 4, createAsteroid, this);
-  }
-
-  else if (score === 500) {
-    // Delete our loops making the enemies and asteroids
-    game.time.events.remove(createEnemyLoop);
-    game.time.events.remove(createAsteroidLoop);
-
-    // And replace them with quicker ones
-    createEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 2, createEnemy, this);
-    createAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 4, createAsteroid, this);
-  }
-
-  else if (score === 800) {
-    // Delete our loops making the enemies and asteroids
-    game.time.events.remove(createEnemyLoop);
-    game.time.events.remove(createAsteroidLoop);
-
-    // And replace them with quicker ones
-    createEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 1, createEnemy, this);
-    createAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 3, createAsteroid, this);
-  }
-
-  else if (score === 1200) {
-    // Delete our loops making the enemies and asteroids
-    game.time.events.remove(createEnemyLoop);
-    game.time.events.remove(createAsteroidLoop);
-
-    // And replace them with quicker ones
-    createEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 0.5, createEnemy, this);
-    createAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 2, createAsteroid, this);
-  }
 }
 
 function playerOneDeath (player1, bullet) {
@@ -183,8 +151,8 @@ function playerOneDeath (player1, bullet) {
   restartText.visible = true;
 
   // Stop loops creating enemies and asteroids
-  game.time.events.remove(createEnemyLoop);
-  game.time.events.remove(createAsteroidLoop);
+  game.time.events.remove(creatingEnemyLoop);
+  game.time.events.remove(creatingAsteroidLoop);
 
   // Call the restart function once any part of the game has been clicked
   game.input.onTap.addOnce(restart, this);
@@ -284,6 +252,71 @@ function fireEnemyBullet (enemy) {
         enemyBulletTime = game.time.now + 200;
       }
     }
+}
+
+function firstChangeDifficulty () {
+  // Remove our current loops
+  game.time.events.remove(creatingEnemyLoop);
+  game.time.events.remove(creatingAsteroidLoop);
+
+  // And replace them with quicker ones
+  creatingEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 2.5, createEnemy, this);
+  creatingAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 5.5, createAsteroid, this);
+
+  // Add a new timer
+  timer = game.time.events.add(Phaser.Timer.SECOND * 35, secondChangeDifficulty, this);
+
+  // Set our log text to display the changes in difficulty
+  logText.text = "Enemy Spawn Time increased by 1.5 seconds. Asteroid Spawn Time increased by 0.5 seconds";
+  logText.visible = true;
+
+  // Add a small timer to fade out the text
+  game.time.events.add(Phaser.Timer.SECOND * 5, removeLogText, this);
+}
+
+function secondChangeDifficulty () {
+  // Remove our current loops
+  game.time.events.remove(creatingEnemyLoop);
+  game.time.events.remove(creatingAsteroidLoop);
+
+  // And replace them with quicker ones
+  creatingEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 1.5, createEnemy, this);
+  creatingAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 3, createAsteroid, this);
+
+  // Add a new timer
+  timer = game.time.events.add(Phaser.Timer.SECOND * 35, thirdChangeDifficulty, this);
+
+  // Set our log text to display the changes in difficulty
+  logText.text = "Enemy Spawn Time increased by 1.0 seconds. Asteroid Spawn Time increased by 2.5 seconds";
+  logText.visible = true;
+
+  // Add a small timer to fade out the text
+  game.time.events.add(Phaser.Timer.SECOND * 5, removeLogText, this);
+}
+
+function thirdChangeDifficulty () {
+  // Remove our current loops
+  game.time.events.remove(creatingEnemyLoop);
+  game.time.events.remove(creatingAsteroidLoop);
+
+  // And replace them with quicker ones
+  creatingEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 0.5, createEnemy, this);
+  creatingAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 2, createAsteroid, this);
+
+  // Add a new timer
+  timer = game.time.events.loop(Phaser.Timer.SECOND * 60, thirdChangeDifficulty, this);
+
+  // Set our log text to display the changes in difficulty
+  logText.text = "Enemy Spawn Time increased by 1.0 seconds. Asteroid Spawn Time increased by 1.0 seconds";
+  logText.visible = true;
+
+  // Add a small timer to fade out the text
+  game.time.events.add(Phaser.Timer.SECOND * 5, removeLogText, this);
+}
+
+// This function is a simple one to fade out the log text
+function removeLogText () {
+  logText.visible = false;
 }
 
 // Note this function is the same as create accept it does a few different things
