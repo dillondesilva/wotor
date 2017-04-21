@@ -87,8 +87,8 @@ function create () {
   restartText.visible = false;
 
   // Create the element that displays logs when the diffiuclty has changed
-  logText = game.add.text(60, 550, 'Difficulty Increased', {font: '16px Tahoma', fill: '#999'});
-  logText.visible = false;
+  logText = game.add.text(60, 550, 'Enemy Spawn Time is currently 4.0 seconds. Asteroid Spawn Time is currently 6.0 seconds', {font: '16px Tahoma', fill: '#999'});
+  game.time.events.add(Phaser.Timer.SECOND * 5, removeLogText, this);
 
   // Create our emission animations for our characters
   player1.animations.add('emissionsP1');
