@@ -304,7 +304,7 @@ function thirdChangeDifficulty () {
   creatingAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 2, createAsteroid, this);
 
   // Add a new timer
-  timer = game.time.events.loop(Phaser.Timer.SECOND * 60, thirdChangeDifficulty, this);
+  timer = game.time.events.add(Phaser.Timer.SECOND * 60, thirdChangeDifficulty, this);
 
   // Set our log text to display the changes in difficulty
   logText.text = "Enemy Spawn Time increased by 1.0 seconds. Asteroid Spawn Time increased by 1.0 seconds";
