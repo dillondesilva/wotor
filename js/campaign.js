@@ -1,16 +1,6 @@
 var game;
 
-function campaign(context) {
-  game = new Phaser.Game(800,
-    600,
-    Phaser.AUTO,
-    context.viewElement,
-    { preload: preload, create: create, update: update});
-
-    this.game.stage.scale.pageAlignHorizontally = true;
-    this.game.stage.scale.pageAlignVertically = true;
-    this.game.stage.scale.refresh();
-}
+game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update});
 
 function preload () {
   // All the necessary assets for my game so far
@@ -33,8 +23,8 @@ var totalScoreText;
 var restartText;
 var enemies;
 var asteroids;
-var creatingEnemyLoop;
-var creatingAsteroidLoop;
+var createEnemyLoop;
+var createAsteroidLoop;
 var enemyBullets;
 var gameOverText;
 var waspace;
@@ -99,10 +89,10 @@ function create () {
   player1.animations.play('emissionsP1', 50, true);
 
   // Set a time loop so that every second, the createEnemy function is called to create an enemy
-  creatingEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND, createEnemy, this);
+  createEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 4, createEnemy, this);
 
   // Set a time loop so that every second, the createAsteroid function is called to create an asteroid
-  creatingAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 4, createAsteroid, this);
+  createAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 6, createAsteroid, this);
 }
 
 function update () {
@@ -128,6 +118,47 @@ function update () {
   game.physics.arcade.overlap(player1, enemies, playerOneDeath, null, this);
   game.physics.arcade.overlap(player1, asteroids, playerOneDeath, null, this);
   game.physics.arcade.overlap(asteroids, bullets, asteroidExplosion, null, this);
+
+  // The following block of code deals with increasing the difficulty based on the score
+  if (score === 200) {
+    // Delete our loops making the enemies and asteroids
+    game.time.events.remove(createEnemyLoop);
+    game.time.events.remove(createAsteroidLoop);
+
+    // And replace them with quicker ones
+    createEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 2, createEnemy, this);
+    createAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 4, createAsteroid, this);
+  }
+
+  else if (score === 500) {
+    // Delete our loops making the enemies and asteroids
+    game.time.events.remove(createEnemyLoop);
+    game.time.events.remove(createAsteroidLoop);
+
+    // And replace them with quicker ones
+    createEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 2, createEnemy, this);
+    createAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 4, createAsteroid, this);
+  }
+
+  else if (score === 800) {
+    // Delete our loops making the enemies and asteroids
+    game.time.events.remove(createEnemyLoop);
+    game.time.events.remove(createAsteroidLoop);
+
+    // And replace them with quicker ones
+    createEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 1, createEnemy, this);
+    createAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 3, createAsteroid, this);
+  }
+
+  else if (score === 1200) {
+    // Delete our loops making the enemies and asteroids
+    game.time.events.remove(createEnemyLoop);
+    game.time.events.remove(createAsteroidLoop);
+
+    // And replace them with quicker ones
+    createEnemyLoop = game.time.events.loop(Phaser.Timer.SECOND * 0.5, createEnemy, this);
+    createAsteroidLoop = game.time.events.loop(Phaser.Timer.SECOND * 2, createAsteroid, this);
+  }
 }
 
 function playerOneDeath (player1, bullet) {
@@ -152,8 +183,8 @@ function playerOneDeath (player1, bullet) {
   restartText.visible = true;
 
   // Stop loops creating enemies and asteroids
-  game.time.events.remove(creatingEnemyLoop);
-  game.time.events.remove(creatingAsteroidLoop);
+  game.time.events.remove(createEnemyLoop);
+  game.time.events.remove(createAsteroidLoop);
 
   // Call the restart function once any part of the game has been clicked
   game.input.onTap.addOnce(restart, this);
@@ -257,6 +288,7 @@ function fireEnemyBullet (enemy) {
 
 // Note this function is the same as create accept it does a few different things
 function restart () {
+  time = game.time.reset();
   score = 0;
   this.create();
 }
