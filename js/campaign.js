@@ -9,6 +9,7 @@ function preload () {
   game.load.image('bullet', 'assets/playerbullet.png');
   game.load.spritesheet('enemy', 'assets/enemyship.png', 43, 65, 2);
   game.load.spritesheet('explosion', 'assets/explosion.png', 64, 64, 18);
+  game.load.image('boss', 'assets/boss.png');
   game.load.image('asteroid', 'assets/asteroid.png');
   game.load.image('enemyBullet', 'assets/enemyBullet.png');
 }
@@ -72,7 +73,7 @@ function create () {
   };
 
   // Create the element to display the score as text
-  scoreText = game.add.text(16, 16, 'Score: 0', { font: '32px Tahoma', fill: '#999' });
+  scoreText = game.add.text(16, 16, '0', { font: '32px Tahoma', fill: '#999' });
 
   // Create the element to say Game Over as text
   gameOverText = game.add.text(200, 175, 'Game Over', {font: '64px Tahoma', fill: '#999'});
@@ -169,7 +170,7 @@ function enemyDeath (bullet, enemy) {
 
   // Deal with putting up the score by 100
   score += 100;
-  scoreText.text = 'Score: ' + score;
+  scoreText.text = score;
 
   // Kill the bullet and enemies
   bullet.kill();
@@ -241,7 +242,7 @@ function fireBullet () {
   }
 }
 
-// Fires an enemy bullet exactly like player one and two except it is called differently. Scroll up to see
+// Fires an enemy bullet exactly like player one except it is called differently. Scroll up to see
 function fireEnemyBullet (enemy) {
     if (game.time.now > enemyBulletTime) {
       var bullet = enemyBullets.getFirstExists(false);
@@ -323,5 +324,6 @@ function removeLogText () {
 function restart () {
   time = game.time.reset();
   score = 0;
+  logText.destroy();
   this.create();
 }
