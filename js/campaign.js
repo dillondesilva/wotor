@@ -118,6 +118,17 @@ function update () {
     player1.frame = 4;
   }
 
+  // The following block of code deals with not letting the player move in a certain direction if they are at a certain point
+  if (player1.x >= 750) {
+    if (cursors.right.isDown) {
+      player1.body.velocity.x = 0;
+    }
+  } else if (player1.x <= 10) {
+    if (cursors.left.isDown) {
+      player1.body.velocity.x = 0;
+    }
+  }
+
   // If the space bar is pressed, it will launch the functions to fire each player 1s bullets
   if (waspace.space.isDown) {
     fireBullet();
