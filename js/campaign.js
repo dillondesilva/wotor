@@ -10,6 +10,7 @@ function preload () {
   game.load.spritesheet('enemy', 'assets/enemyship.png', 43, 65, 2);
   game.load.spritesheet('explosion', 'assets/explosion.png', 64, 64, 18);
   game.load.image('boss', 'assets/boss.png');
+  game.load.image('restart', 'assets/restart.png');
   game.load.image('asteroid', 'assets/asteroid.png');
   game.load.image('enemyBullet', 'assets/enemyBullet.png');
 }
@@ -23,7 +24,7 @@ var scoreText;
 var timer;
 var logText;
 var totalScoreText;
-var restartText;
+var restart;
 var enemies;
 var asteroids;
 var creatingEnemyLoop;
@@ -84,8 +85,8 @@ function create () {
   totalScoreText.visible = false;
 
   // Create the element that displays the message to click anywhere to restart
-  restartText = game.add.text(120, 290, 'Click Anywhere to Restart the Game', {font: '32px Tahoma', fill: '#999'});
-  restartText.visible = false;
+  restart = game.add.button(game.world.centerX - 100, 290, 'restart', restartGame, this);
+  restart.visible = false;
 
   // Create the element that displays logs when the diffiuclty has changed
   logText = game.add.text(60, 550, 'Enemy Spawn Time is currently 4.0 seconds. Asteroid Spawn Time is currently 6.0 seconds', {font: '16px Tahoma', fill: '#999'});
@@ -149,14 +150,11 @@ function playerOneDeath (player1, bullet) {
   scoreText.visible = false;
   totalScoreText.text = "Your Final Score was " + score + " Points";
   totalScoreText.visible = true;
-  restartText.visible = true;
+  restart.visible = true;
 
   // Stop loops creating enemies and asteroids
   game.time.events.remove(creatingEnemyLoop);
   game.time.events.remove(creatingAsteroidLoop);
-
-  // Call the restart function once any part of the game has been clicked
-  game.input.onTap.addOnce(restart, this);
 }
 
 function enemyDeath (bullet, enemy) {
@@ -321,7 +319,7 @@ function removeLogText () {
 }
 
 // Note this function is the same as create accept it does a few different things
-function restart () {
+function restartGame () {
   time = game.time.reset();
   score = 0;
   logText.destroy();
