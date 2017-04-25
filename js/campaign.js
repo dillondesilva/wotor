@@ -73,14 +73,14 @@ function create () {
   };
 
   // Create the element to display the score as text
-  scoreText = game.add.text(16, 16, '0', { font: '32px Tahoma', fill: '#999' });
+  scoreText = game.add.text(16, 16, '0', { font: '28px Tahoma', fill: '#999' });
 
   // Create the element to say Game Over as text
   gameOverText = game.add.text(200, 175, 'Game Over', {font: '64px Tahoma', fill: '#999'});
   gameOverText.visible = false;
 
   // Create the element to display the total score at the end of the game
-  totalScoreText = game.add.text(160, 250, 'Your Final Score was ', {font: '32px Tahoma', fill: '#999' });
+  totalScoreText = game.add.text(160, 250, 'Your Final Score was ', {font: '28px Tahoma', fill: '#999' });
   totalScoreText.visible = false;
 
   // Create the element that displays the message to click anywhere to restart
