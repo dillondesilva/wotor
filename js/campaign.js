@@ -196,7 +196,7 @@ function asteroidExplosion (asteroid, bullet) {
 
   // Deal with putting up the score by 50
   score += 50;
-  scoreText.text = 'Score: ' + score;
+  scoreText.text = score;
 
   // Kill the bullet
   bullet.kill();
