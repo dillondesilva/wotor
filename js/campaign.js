@@ -147,10 +147,12 @@ function playerOneDeath (player1, bullet) {
   // Change the flag death to true so autosaving stops. See autoSave.js
   death = true;
 
-  // Update the final score in the database
-  database.child(uid).child("score").update({
-    score: score
-  });
+  // Update the final score in the database if it is higher than the one currently there
+  if (databaseScore < score) {
+    database.child(uid).child("score").update({
+      score: score
+    });
+  }
 
   // Create an explosion
   player1.loadTexture('explosion');
