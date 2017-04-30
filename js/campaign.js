@@ -148,7 +148,7 @@ function playerOneDeath (player1, bullet) {
   death = true;
 
   // Update the final score in the database
-  database.child(uid).update({
+  database.child(uid).child("score").update({
     score: score
   });
 
