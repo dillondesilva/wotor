@@ -4,6 +4,19 @@
 	<meta charset="UTF-8" />
 	<title>Warriors of The Outer Rim</title>
 	<script type="text/javascript" src="lib/phaser.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/3.9.0/firebase.js"></script>
+  <script>
+    // Initialize Firebase
+    var config = {
+      apiKey: "AIzaSyAHJXWncj21BpqdOs_pxHnQWwwn-VcRBvw",
+      authDomain: "wotor-a4d7b.firebaseapp.com",
+      databaseURL: "https://wotor-a4d7b.firebaseio.com",
+      projectId: "wotor-a4d7b",
+      storageBucket: "wotor-a4d7b.appspot.com",
+      messagingSenderId: "404704681338"
+    };
+    firebase.initializeApp(config);
+  </script>
   <link href="https://fonts.googleapis.com/css?family=Exo" rel="stylesheet">
   <style>
     canvas {
@@ -12,5 +25,7 @@
     }
   </style>
   <script type="text/javascript" src="js/campaign.js"></script>
+  <script type="text/javascript" src="js/auth.js"></script>
+  <script type="text/javascript" src="js/autoSave.js"></script>
   </body>
   </html>

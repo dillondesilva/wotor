@@ -25,6 +25,7 @@ var timer;
 var logText;
 var totalScoreText;
 var restart;
+var death = false;
 var enemies;
 var asteroids;
 var creatingEnemyLoop;
@@ -143,6 +144,14 @@ function update () {
 }
 
 function playerOneDeath (player1, bullet) {
+  // Change the flag death to true so autosaving stops. See autoSave.js
+  death = true;
+
+  // Update the final score in the database
+  database.child(uid).child("score").update({
+    score: score
+  });
+
   // Create an explosion
   player1.loadTexture('explosion');
   player1.animations.add('kaboom');
@@ -333,6 +342,7 @@ function removeLogText () {
 function restartGame () {
   time = game.time.reset();
   score = 0;
+  death = false;
   logText.destroy();
   this.create();
 }
