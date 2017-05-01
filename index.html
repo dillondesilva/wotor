@@ -18,10 +18,35 @@
     firebase.initializeApp(config);
   </script>
   <link href="https://fonts.googleapis.com/css?family=Exo" rel="stylesheet">
+  <body>
+    <div class = "topBar">
+      <h2 class = "barTitle">Warriors of The Outer Rim</h2>
+    </div>
+  </body>
   <style>
+    body {
+      margin: 5px;
+      padding: 0;
+    }
+
     canvas {
       display: block;
       margin: auto;
+      margin-top: 5px;
+    }
+
+    .topBar {
+      height: 50px;
+      width: 100%;
+      background-color: #43464B;
+    }
+
+    .barTitle {
+      color: white;
+      font-family: "Exo", sans-serif;
+      text-align: left;
+      padding: 0;
+      margin: 5px;
     }
   </style>
   <script type="text/javascript" src="js/campaign.js"></script>
