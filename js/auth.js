@@ -66,8 +66,10 @@ function pushToDatabase (finalCode) {
       username: finalCode
     });
 
-// Here, we will find the key of the username that we just pushed and save that to localStorage
-    database.once("value").then(function(snapshot) {
+// Here, we will find the key of the username that we just pushed and save that to localStorage. We will also
+// change the variable uid to the key of the username so that when uid is referenced in other files, it will go
+// down the correct path not null
+  database.once("value").then(function(snapshot) {
       snapshot.forEach( function (item) {
         if(item.child("username").val() === finalCode) {
           localStorage.setItem("uid", item.key);
