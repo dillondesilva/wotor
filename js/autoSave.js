@@ -8,7 +8,7 @@ database.child(uid).child("score").once("value", function(snapshot) {
 
 // A simple loop to just update the score in the database every 20 seconds if the score is higher then the one in the database
 setInterval(function () {
-  if (databaseScore < score) {
+  if ((databaseScore < score) && (death !== true)) {
     database.child(uid).child("score").update({
       score: score
     });
