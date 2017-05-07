@@ -71,7 +71,7 @@ function pushToDatabase (finalCode) {
       snapshot.forEach( function (item) {
         if(item.child("username").val() === finalCode) {
           localStorage.setItem("uid", item.key);
-          uid = localStorage.getItem("uid");
+          uid = item.key;
         }
       });
     });
