@@ -9,7 +9,6 @@ var adjectiveArray = ["Smelly", "Happy", "Cranky", "Pretty", "Crispy", "Chewy", 
 // Check if the client has a registered uid in their localStorage. If they don't the function
 // generateUsername will be called and the console displays a message. Otherwise the console will
 // output a welcome message
-
 if (uid === null) {
   console.log("This user does not have a registered uid. Beginning generation process");
   this.generateUsername();
@@ -72,6 +71,7 @@ function pushToDatabase (finalCode) {
       snapshot.forEach( function (item) {
         if(item.child("username").val() === finalCode) {
           localStorage.setItem("uid", item.key);
+          uid = localStorage.getItem("uid");
         }
       });
     });
